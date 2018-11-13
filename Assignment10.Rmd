@@ -1,0 +1,58 @@
+---
+title: "Assignment10"
+author: "Anthony"
+date: "October 18, 2018"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Question 1 & 2
+```{r}
+adult <- read.csv("C:/Users/student/Documents/MATH421/adult.csv", header = FALSE)
+```
+
+#Question 3
+``` {r}
+colnames(adult)<- c('age','workclass','fnlwgt','education','education_num','marital_statsu','occupation','relationship','race','sex','capital_gain','capital_loss','hours_per_week','native_country','income')
+```
+
+#Question 4 & 5
+```{r}
+for(i in 1:ncol(adult)) {
+    adult[adult ==" ?"]= NA  
+    blank <- sum(is.na(adult[i]))
+    if(blank > 0){
+      if(is.numeric(adult[[i]]) == TRUE) {
+         adult[[i]][is.na(adult[[i]])] <- mean(adult[[i]], na.rm = TRUE)
+      }
+      else {
+        levels=unique(adult[,i])
+        adult[,i][is.na(adult[,i])]=levels[which.max(tabulate(match(adult[,i], x = levels)))]
+      }
+    }
+}
+sample(adult)
+```
+
+#Question 6
+```{r}
+library(ggplot2)
+ggplot(data = adult) + geom_bar(mapping = aes(x = race, fill = education)) + facet_wrap(~education)
+
+ggplot(data = adult) + geom_bar(mapping = aes(x = occupation, fill = hours_per_week), position = "dodge")
+
+ggplot(data = adult) + geom_density(mapping=aes(x = hours_per_week, fill = sex)) + facet_wrap(~sex)
+
+ggplot(data = adult) + geom_density(mapping=aes(x = age, fill = race)) + facet_wrap(~race)
+```
+#Question 7
+```{r}
+set.seed(101) # Set Seed so that same sample can be reproduced in future also
+sample <- sample.int(n = nrow(adult), size = floor(.60*nrow(adult)), replace = F)
+train <- adult[sample, ]
+test  <- adult[-sample, ]
+```
+

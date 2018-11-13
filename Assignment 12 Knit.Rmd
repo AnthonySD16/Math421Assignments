@@ -1,0 +1,161 @@
+---
+title: "Assignment 12"
+author: "Anthony"
+date: "October 30, 2018"
+output: word_document
+---
+
+```{r}
+adult =read.csv("C:/Users/student/Documents/MATH421/adult.csv", header=FALSE)
+titanic= read.csv("C:/Users/student/Documents/MATH421/titanics.csv")
+library(caret)
+library(ggplot2)
+library(lattice)
+library(rpart)
+library(glmnet)
+```
+
+#Question 1 adult
+```{r}
+colnames(adult)[1] <- "Age"
+colnames(adult)[2] <- "Workclass"
+colnames(adult)[3] <- "fnlwgt"
+colnames(adult)[4] <- "Education"
+colnames(adult)[5] <- "Educationnum"
+colnames(adult)[6] <- "Maritalstatus"
+colnames(adult)[7] <- "Occupation"
+colnames(adult)[8] <- "Relationship"
+colnames(adult)[9] <- "Race"
+colnames(adult)[10] <- "Sex"
+colnames(adult)[11] <- "Capitalgain"
+colnames(adult)[12] <- "Capitalloss"
+colnames(adult)[13] <- "Hoursperweek"
+colnames(adult)[14] <- "Nativecountry"
+colnames(adult)[15] <- "Incomeclass"
+
+for(i in 1:ncol(adult)) {
+    adult[adult ==" ?"]= NA 
+    blanks <- sum(is.na(adult[i]))
+    if(blanks > 0){
+      if(is.numeric(adult[[i]]) == TRUE) {
+        adult = preProcess(adult, method = "medianImpute")
+      }
+      else {
+        levels=unique(adult[,i])
+        adult[,i][is.na(adult[,i])]=levels[which.max(tabulate(match(adult[,i], x = levels)))]
+      }
+    }
+}
+```
+
+#Question 1 titanic
+```{r}
+titanic$PassengerId =  NULL
+titanic$Ticket =  NULL
+titanic$Name = NULL
+titanic$Cabin = NULL
+titanic$Survived = factor(titanic$Survived)
+titanic$Pclass = factor(titanic$Pclass)
+titanic$Age[is.na(titanic$Age)] = mean(titanic$Age, na.rm = TRUE)
+levels(titanic$Embarked) = c("S","C","Q","S")
+ 
+for(i in 1:ncol(titanic)) {
+    titanic[titanic ==" ?"]= NA 
+    blanks <- sum(is.na(titanic[i]))
+    if(blanks > 0){
+      if(is.numeric(titanic[[i]]) == TRUE) {
+        titanic = preProcess(df, method = "medianImpute")
+      }
+      else {
+        levels=unique(df[,i])
+        titanic[,i][is.na(df[,i])]=levels[which.max(tabulate(match(df[,i], x = levels)))]
+      }
+    }
+}
+```
+
+#Question 2
+```{r}
+
+myGrid <- expand.grid(mtry = c(1:2), splitrule = c("gini"),
+                     min.node.size = c(1:2))
+RandForestAdult <- train(
+  Incomeclass~., 
+  data = adult, method = "ranger",
+  trControl = trainControl(method = "cv", number = 7, verboseIter = TRUE),
+  tuneGrid = myGrid)
+
+RandForestTitanic <- train(
+  Survived~., 
+  data = titanic, method = "ranger",
+  trControl = trainControl(method ="cv", number = 7, verboseIter = TRUE),
+  tuneGrid =myGrid)
+
+RandForestAdult
+RandForestTitanic
+```
+
+#Question 3
+```{r}
+DecTreeAdult <- train(
+  Incomeclass~., 
+  data = adult, method = "rpart",
+  trControl = trainControl(method="cv",number=10,verboseIter = TRUE))
+
+DecTreeTitanic <- train(
+  Survived~.,
+  data =titanic, method ="rpart",
+  trControl =trainControl(method="cv",number=10,verboseIter = TRUE))
+
+DecTreeAdult
+DecTreeTitanic
+```
+
+#Question 4
+Fitting mtry = 2, splitrule = gini, min.node.size = 1 on full training set
+Fitting mtry = 2, splitrule = gini, min.node.size = 2 on full training set
+
+#Question 5
+```{r}
+plot(RandForestAdult)
+plot(RandForestTitanic)
+```
+
+#Question 6
+```{r}
+myGrid2 <- expand.grid(mtry = c(1:4), splitrule = c("gini","extratrees"),
+                     min.node.size = c(1:5))
+set.seed(41)
+RandForestAdult2 <- train(Incomeclass ~.,data = adult, method = "ranger",
+               trControl = trainControl(method ="cv", number = 7, verboseIter = TRUE),
+               tuneGrid = myGrid2)
+ 
+RandForestTitanic2 <- train(Survived ~.,data = titanic, method = "ranger",
+               trControl = trainControl(method ="cv", number = 7, verboseIter = TRUE),
+               tuneGrid = myGrid2)
+ 
+RandForestAdult2
+RandForestTitanic2
+```
+
+#Question 7
+```{r}
+plot(RandForestAdult2)
+plot(RandForestTitanic2)
+```
+
+#Question 8
+```{r}
+myGrid3=expand.grid(.alpha=0:1,.lambda=seq(0.001,1,length=10))
+ 
+GLMAdultModel<- train(Incomeclass~., data=adult, method="glmnet")
+GLMAdultModel2<- train(Incomeclass~., data=adult, method="glmnet", tuneGrid=myGrid3)
+
+GLMTitanicModel<- train(Survived~., data=titanic, method="glmnet")
+GLMTitanicModel2<- train(Survived~., data=titanic, method="glmnet", tuneGrid=myGrid3)
+
+plot(GLMAdultModel)
+plot(GLMAdultModel2)
+plot(GLMTitanicModel)
+plot(GLMTitanicModel2)
+```

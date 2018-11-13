@@ -1,0 +1,93 @@
+---
+title: "Assignment4"
+author: "Anthony DiStefano"
+date: "October 4, 2018"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+#1 Write a function: input a number x and return x^2+3x+1
+```{r}
+cubicf = function(x)
+ {
+    return(x^2 + 3*x + 1) 
+    }
+ cubicf(3)
+```
+
+
+#2	Write a function: input a vector and return the product of all the entries in the vector
+```{r}
+vector1 <- function(x)
+ {
+     return(prod(x))
+ }
+ vector1(c(1,2,3,4))
+
+```
+
+#3 Write a function: input a vector v and a number n and return a vector with its missing data being replaced by n
+```{r}
+vector2<- function(v,n)
+ {
+     v[is.na(v)]<- n
+     return(v)
+ }
+v5<- c(5,NA,6)
+vector2(v5,6)
+```
+
+#4	Write a function: input a numeric vector and return a vector with its missing data being replaced by the mean of the vector
+```{r}
+ F4<- function(x)
+ {
+     avg <- mean(x,na.rm = TRUE)
+     x[is.na(x)] <- avg
+     return(x)
+ }
+ F4(c(NA,2,3,4))
+```
+
+#5 Write a function: input a data frame and return a data frame with numeric missing values being replaced by the mean of the corresponding column.  Check your function on the titanic data
+```{r}
+F5<- function(df) {
+  varcount<- ncol(df)
+  for(i in 1:varcount) {
+    if(is.numeric(df[[i]]) == TRUE) {
+      df[[i]][is.na(df[[i]])] <- mean(df[[i]], na.rm = TRUE)
+    }
+  }
+  return(df)
+}
+
+```
+
+
+#6	Write a function that plots a bar chart of an input categorical variable.  Check your function on the titanic data
+```{r}
+Num6 <- function(df, Var1) {
+    library(ggplot2)
+     rt = ggplot(data = df) + geom_bar(mapping = aes(x = df[,Var1]))
+     return(rt)
+}
+Num6(Titanic,2)
+```
+
+#7	Write a function that plots bar chart of two input categorical variables.  Check your function on the titanic data
+```{r}
+F7 <- function(df, variable1, variable2) {
+    library(ggplot2)
+     rt = ggplot(data = df) + geom_bar(mapping = aes(x = df[,variable1], fill = df[,variable2]), position = "dodge")
+     return(rt)
+ }
+ F7(Titanic, 4,2)
+```

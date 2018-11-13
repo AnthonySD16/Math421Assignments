@@ -1,0 +1,114 @@
+---
+title: "Assignment 14"
+author: "Anthony"
+date: "November 7, 2018"
+output: word_document
+---
+
+#1
+```{r}
+QuickClean = function(x,i)
+{
+  if(i==0)
+  {
+    x = x[complete.cases(x), ]
+    return(x)
+  }
+  if(i==1)
+  {
+    checkcol = function(y)
+    {
+      if(is.numeric(y)==TRUE)
+      {y[is.na(y)] = mean(y,na.rm = TRUE)
+      }
+      else
+      {
+        levels=unique(y)
+        y[is.na(y)]= levels[which.max(tabulate(match(y, x = levels)))]
+        Return(y)
+      }
+      x=lapply(x,checkcol)
+      Return(data.frame(x))
+
+    }
+  }
+}
+
+```
+
+#2
+```{r}
+quick_visual <- function(x, parameter){
+  library(ggplot2)
+  if(is.data.frame(x) & task == 1){
+    df_factors <- x[,sapply(df, is.factor)]
+    
+    cat.5 <- function(x)
+    {
+      l <- (length(unique(x)) < 5)
+      return(l)
+    }
+    
+    df_factors5 <- df_factors[, sapply(df_factors, cat.5)]
+    
+    combinations <- combn(names(df_factor5), 2, simplify = TRUE)
+    
+    bar.charts <- function(d){
+      chart <- ggplot(d) + geom_bar(mapping = aes(x=d[,1], fill=d[,2]), position = "dodge") 
+        xlab(names(d[1])) +
+        labs(fill = names(d[2]))
+      
+      return(chart)
+    }
+    
+    c <- function(x){
+      bar.charts(df_factors5[,x])
+    }
+    
+    charts <- apply(combinations, 2, c)
+    
+    return(charts)
+  } else if (taskNumber == 2){
+    df_factors <- x[,sapply(x, is.factor)]
+    
+    cat.5 <- function(x)
+    {
+      l <- (length(unique(x)) < 5)
+      return(l)
+    }
+    
+    df_factors5 <- df_factors[, sapply(df_factors, cat.5)]
+    
+    combinations <- combn(names(df_factor5), 2, simplify = TRUE)
+    
+    density.curves <- function(d){
+      chart <- ggplot(d) + geom_density(aes(x=d[,1], color=d[,2]), position = "dodge") +
+        xlab(names(d[1])) +
+        labs(fill = names(d[2]))
+      
+      return(chart)
+    }
+    
+    c <- function(x){
+      density.curves(df_factors5[,x])
+    }
+    
+    charts <- apply(combinations, 2, c)
+    
+    return(charts)
+  } else if (taskNumer == 3){
+    nums <- unlist(lapply(x, is.numeric))
+    xnum <- x[ , nums]
+    pairs(xnum[,1:ncol(xnum)], lower.panel = NULL)
+  } else {print("Invalid taskNumber, choose between 1, 2, or 3")}}
+```
+
+#3
+```{r}
+quick_model <- function(x){
+  myGrid <- expand.grid(mtry = 2, splitrule = c("gini"), min.node.size = c(1:3))
+  model <- train(target~.,data = x, method = "ranger",
+                 trControl = trainControl(method ="cv", number = 7, verboseIter = TRUE),
+                 tuneGrid = myGrid)
+  model}
+```

@@ -1,0 +1,98 @@
+---
+title: "Assignment3"
+author: "Anthony"
+date: "September 24, 2018"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+Titanic = read.csv("C:/Users/student/Documents/titanic.csv")
+Titanic$Pclass = factor(Titanic$Pclass)
+Titanic$Sex = factor(Titanic$Sex)
+Titanic$Survived = factor(Titanic$Survived)
+```
+ 
+# Question 1 & 2 & 4
+``` {r}
+sum(is.na(Titanic))
+Titanic[is.na(Titanic)] = mean(Titanic$Age, na.rm = TRUE)
+Titanic$SibSp = NULL
+Titanic$Parch = NULL
+Titanic$Ticket = NULL
+Titanic$Cabin = NULL
+Titanic$Name = NULL
+Titanic$PassengerID = NULL
+```
+
+# Question 5 - 11
+````{r}
+mean(Titanic$Age)
+
+TitanicFemale <- subset(Titanic, Titanic$Sex == "female")
+  mean(TitanicFemale$Age)
+  
+  Class1 <- subset(Titanic, Titanic$Pclass == "1")
+  median(Class1$Fare)
+  
+  NonClassFemales <- subset(Titanic, Titanic$Pclass != "1" & Titanic$Sex == "female")
+median(NonClassFemales$Fare)
+
+NonClassFemalesAlive <- subset(Titanic, Titanic$Pclass != "3" & Titanic$Sex == "female" & Titanic$Survived == "1")
+  median(NonClassFemalesAlive$Age)
+  
+  FemaleTeensAlive<- subset(Titanic, Titanic$Survived == "1" & Titanic$Sex == "female" & Titanic$Age >= "13" & Titanic$Age <= "19")
+  mean(FemaleTeensAlive$Fare)
+  
+  FemaleTeensAlive1<- subset(Titanic, Titanic$Survived == "1" & Titanic$Sex == "female" & Titanic$Age >= "13" & Titanic$Age <= "19" & Titanic$Pclass == "1")
+FemaleTeensAlive2 <- subset(Titanic, Titanic$Survived == "1" & Titanic$Sex == "female" & Titanic$Age >= "13" & Titanic$Age <= "19" & Titanic$Pclass == "2")
+ FemaleTeensAlive3<- subset(Titanic, Titanic$Survived == "1" & Titanic$Sex == "female" & Titanic$Age >= "13" & Titanic$Age <= "19" & Titanic$Pclass == "3")
+```
+# Questions 12-13
+```{r}
+AboveAvgFare <-subset(Titanic, Titanic$Fare >= "32.2")
+SurvivedFare <- sum(AboveAvgFare$Survived == "1")
+DeathFare <- sum(AboveAvgFare$Survived == "0")
+Ratio <- SurvivedFare/DeathFare
+
+Titanic$sFare <- (Titanic$Fare - mean(Titanic$Fare)) / sd(Titanic$Fare)
+```
+
+# Questions 14 - 20
+```{r}
+YoungPassengers <- subset(Titanic, Titanic$Age <= "29.70")
+ggplot(data = YoungPassengers) + geom_bar(mapping = aes(x = Sex, fill = Survived), position = "dodge")
+
+SurviveHighFare <- subset(Titanic, Titanic$Survived == "1" & Titanic$Fare >= "32.2")
+ggplot(data = SurviveHighFare) + geom_density(mapping = aes(x = Age))
+
+
+EmbSHandQT<- subset(Titanic, Titanic$Embarked =="Q" | Titanic$Embarked == "S")
+ggplot(data = EmbSHandQT) + geom_density(mapping = aes(x = Embarked))
+
+Titanic$cfare <- ifelse(Titanic$Fare > 32.2, "expensive", ifelse(Titanic$Fare < 32.2, "cheap",""))
+
+Titanic$cage = Titanic$Age
+Titanic$cage[(Titanic$cage >0) & (Titanic$cage <=10)] = 0
+Titanic$cage[(Titanic$cage >10) & (Titanic$cage <=20)] = 1
+Titanic$cage[(Titanic$cage >20) & (Titanic$cage <=30)] = 2
+Titanic$cage[(Titanic$cage >30) & (Titanic$cage <=40)] = 3
+Titanic$cage[(Titanic$cage >40) & (Titanic$cage <=50)] = 4
+Titanic$cage[(Titanic$cage >50) & (Titanic$cage <=60)] = 5
+Titanic$cage[(Titanic$cage >60) & (Titanic$cage <=70)] = 6
+Titanic$cage[(Titanic$cage >70) & (Titanic$cage <=80)] = 7
+Titanic$cage[(Titanic$cage >80) & (Titanic$cage <=90)] = 8
+```
+###
+ggplot(data = AboveAvgFare) + geom_bar(mapping = aes(x = cage, fill = Survived), position = "dodge")
+
+ggplot(data = AboveAvgFare) + geom_bar(mapping = aes(x = cage, fill = Survived), position = "dodge") + facet_wrap(~Pclass, nrow =1)
+
+```
+
+
+  
+  
