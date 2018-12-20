@@ -1,0 +1,109 @@
+---
+title: "NFL Home Team Wins"
+author: "Anthony DiStefano"
+date: "December 19, 2018"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+library(ggplot2)
+library(caret)
+library(lattice)
+library(ranger)
+NFL <- read.csv("C:/Users/student/Documents/MATH421/Final Project/Final Project .csv", header=TRUE)
+NFL$schedule_date = NULL
+NFL$Lattitude = NULL
+NFL$Longitude = NULL
+NFL$Elevation = NULL
+NFL$schedule_season <- as.factor(NFL$schedule_season)
+NFL$schedule_playoff <- as.factor(NFL$schedule_playoff)
+NFL$stadium_neutral <- as.factor(NFL$stadium_neutral)
+NFL$Home_team_Win <- as.factor(NFL$Home_team_Win)
+```
+
+## Project Introduction
+- Predicting whether or not the home team wins in the NFL based off of factors about the game
+- This data would be helpful for sportsbooks attempting to create lines for the games for people to bet on. It would also be helpful for sports bettors trying to find an edge when betting
+- If a team is predicted to win based on this model, but are listed as underdogs on sportsbooks, then it would create a good value bet.
+
+## Data Introduction
+- The data was obtained from kaggle
+- 8 numeric input variables
+- 15 categorical input variables
+- 2 binary input variables
+- Target is Home_Team_wins, 0=Loss, 1=Win
+- 4496 data points
+- 5 inputs had missing values
+- 4 rejected variables
+
+## Input variables: Categorical
+- Day: the day of the week which the game was played; 7 days of the week
+- Month: the month in which in the game took place; 6 months (September thru February)
+- Season: the year of the NFL season; 17 seasons (2002-2018)
+- Week: the week in the season in which the game took place; 21 weeks (1-17, 4 rounds of playoffs)
+- Home Team ID: the ID for the team that was home during each game; 32 NFL teams
+- Home Team Division: the division that the home team was in; 8 divisions
+- Home Team Conference: the conference that the home team was in; AFC or NFC
+
+## Input Variables: Categorical cont.
+- Away Team ID: the ID for the team that was away during each game; 32 NFL teams
+- Away Team Division: the division that the away team was in; 8 divisions
+- Away Team Conference: the conference in which the away team was in; AFC or NFC
+- Favorite ID: the ID of the team that was the favorite in each game; 33: 32 teams and push
+-Stadium: name of the stadium in which the game was played; 58 different stadiums
+- Location: the city/state of the stadium where the game was played; 42 different locations
+- Stadium Type: the type of stadium; indoor, outdoor, retractable roof
+- Stadium Surface: the field surface of the stadium; Field Turf or Grass
+
+## Input Variables: Numeric
+- Total Score: the total number of points scored in the game 
+- Home Team Score: the total number of points scored by the home team
+- Away Team Score: the total number of points scored by the away team
+- Spread: how many points the favorite is projected to win by
+- Over/Under (O/U): the total number of points projected to be scored in the game
+- Temperature: the temperature at kickoff
+- Wind MPH: the wind speed at kickoff
+- Humidity: the humidity at kickoff
+
+## Input Variables: Binary
+- Playoffs: whether or not the game was a playoff game or not (1 = playoffs, 0 = regular season)
+- Neutral Stadium: whether or not the game was played at a neutral stadium (1 = yes, 0 = no)
+
+## Home Team Wins
+```{r, pressure}
+ggplot(NFL, aes(x = NFL$Home_team_Win)) + geom_bar() + ggtitle("Home Team Win Distribution")
+```
+
+## Wind Speed vs O/U's
+```{r}
+ggplot(data = NFL) + geom_point(mapping = aes(x= NFL$O.U, y = NFL$Total.Score, color = NFL$Stadium_Type)) + ggtitle("O/U's vs Total Score by Stadium Type")
+```
+
+## O/U's vs Total Score
+```{r}
+ggplot(NFL, aes(x = NFL$O.U, y = NFL$Total.Score)) + geom_point() + stat_smooth(method = "lm", color = "red", se = FALSE) + ggtitle("O/U's vs Total Score")
+```
+
+## Recoding Variables
+- Changed month to Autumn and Winter
+- Changed Week to 1st Half, 2nd Half, and Playoffs
+
+## Models
+- Decision Tree: .8696 accuracy
+- Random Forest: .9969 accuracy
+- glmnet: .9986 accuracy 
+
+## Tuned Models
+- Decision Tree: .8594 accuracy
+- Random Forest: .7722 accuracy
+- glmnet: .9987 accuracy
+
+## Conclusion
+- Tuned GLM Model
+- Median Impute
+- Week and Month worse when recoded
+- Future: Recode numerical into groups
